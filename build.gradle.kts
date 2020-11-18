@@ -67,7 +67,7 @@ application {
 }
 
 tasks.getByName<JavaExec>("run") {
-    args = listOf("-c", "$projectDir/src/test/resources/config-local.yml")
+    args = listOf("-c", "$projectDir/conf/config.yml")
 }
 
 dependencies {
