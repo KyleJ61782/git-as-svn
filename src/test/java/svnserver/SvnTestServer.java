@@ -337,7 +337,8 @@ public final class SvnTestServer implements SvnTester {
           new GitPushEmbedded(local, null, false),
           Collections.singleton(branch),
           true,
-          emptyDirs
+          emptyDirs,
+          false
       );
 
       return () -> new TreeMap<>(Collections.singletonMap(prefix, repository));

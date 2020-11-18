@@ -55,6 +55,8 @@ public final class GitRepositoryConfig {
   private boolean renameDetection = true;
   @NotNull
   private EmptyDirsSupport emptyDirs = EmptyDirsSupport.Disabled;
+  @NotNull
+  private boolean allBranches = false;
 
   public GitRepositoryConfig() {
     this(GitCreateMode.ERROR);
@@ -91,7 +93,7 @@ public final class GitRepositoryConfig {
     final LfsStorage lfsStorage = LfsStorageFactory.tryCreateStorage(context);
     final Repository git = createGit(context, fullPath);
 
-    return createRepository(context, lfsStorage, git, pusher.create(context), branches, renameDetection, emptyDirs);
+    return createRepository(context, lfsStorage, git, pusher.create(context), branches, renameDetection, emptyDirs, allBranches);
   }
 
   @NotNull
@@ -111,7 +113,8 @@ public final class GitRepositoryConfig {
                                                @NotNull GitPusher pusher,
                                                @NotNull Set<String> branches,
                                                boolean renameDetection,
-                                               @NotNull EmptyDirsSupport emptyDirs) throws IOException {
+                                               @NotNull EmptyDirsSupport emptyDirs,
+                                               @NotNull boolean allBranches) throws IOException {
     final LockStorage lockStorage;
     if (lfsStorage != null) {
       context.add(LfsStorage.class, lfsStorage);
@@ -121,7 +124,7 @@ public final class GitRepositoryConfig {
     }
 
     final GitFilters filters = new GitFilters(context, lfsStorage);
-    return new GitRepository(context, git, pusher, branches, renameDetection, lockStorage, filters, emptyDirs);
+    return new GitRepository(context, git, pusher, branches, renameDetection, lockStorage, filters, emptyDirs, allBranches);
   }
 
 }

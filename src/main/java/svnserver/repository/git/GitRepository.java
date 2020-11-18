@@ -82,7 +82,8 @@ public final class GitRepository implements AutoCloseable, BranchProvider {
                        boolean renameDetection,
                        @NotNull LockStorage lockStorage,
                        @NotNull GitFilters filters,
-                       @NotNull EmptyDirsSupport emptyDirs) throws IOException {
+                       @NotNull EmptyDirsSupport emptyDirs,
+                       @NotNull boolean allBranches) throws IOException {
     this.context = context;
     this.emptyDirs = emptyDirs;
     final SharedContext shared = context.getShared();
@@ -97,8 +98,20 @@ public final class GitRepository implements AutoCloseable, BranchProvider {
 
     this.gitFilters = filters;
 
-    for (String branch : branches)
-      this.branches.put(StringHelper.normalizeDir(branch), new GitBranch(this, branch));
+    if (allBranches) {
+      List<Ref> refs = git.getRefDatabase().getRefsByPrefix(Constants.R_HEADS);
+      for (Ref ref : refs) {
+        String refSubName = ref.getName().substring(Constants.R_HEADS.length());
+        if (refSubName.equals("trunk") || refSubName.equals("master"))
+          this.branches.put(StringHelper.normalizeDir("/trunk"), new GitBranch(this, refSubName));
+        else
+          this.branches.put(StringHelper.normalizeDir("/branches/" + refSubName), new GitBranch(this, refSubName));
+      }
+    }
+    else {
+      for (String branch : branches)
+        this.branches.put(StringHelper.normalizeDir(branch), new GitBranch(this, branch));
+    }
   }
 
   @NotNull
